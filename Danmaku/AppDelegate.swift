@@ -7,6 +7,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var store: ChunkStore!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        DanmakuPrefs.registerDefaults()
+
         menuBar = MenuBarController()
         overlay = OverlayWindow()
         overlay.orderFrontRegardless()
@@ -47,6 +49,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let ended = n.userInfo?["endedAt"] as? Date
             else { return }
             self?.store.insert(text: text, startedAt: started, endedAt: ended)
+        }
+
+        // デバッグ: 最新10件をコンソールにダンプ
+        NotificationCenter.default.addObserver(forName: .danmakuDumpLatest, object: nil, queue: .main) { [weak self] _ in
+            self?.store.latest(limit: 10) { rows in
+                for (date, text) in rows {
+                    print(String(describing: date), text)
+                }
+            }
         }
     }
 

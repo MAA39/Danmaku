@@ -6,6 +6,7 @@ import SQLite3
 /// テーブル: chunks(id INTEGER PK, started_at REAL, ended_at REAL, text TEXT)
 final class ChunkStore {
     private var db: OpaquePointer?
+    private let q = DispatchQueue(label: "db.chunk.store")
 
     /// DBを開き、なければ作成。WALで速度/堅牢さバランス。
     init() throws {
@@ -18,8 +19,8 @@ final class ChunkStore {
         let url = dir.appendingPathComponent("danmaku.sqlite")
 
         if sqlite3_open_v2(url.path, &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, nil) != SQLITE_OK {
-            defer { sqlite3_close(db) }
-            throw NSError(domain: "ChunkStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "DBを開けませんでした"])
+        defer { sqlite3_close(db) }
+        throw NSError(domain: "ChunkStore", code: 1, userInfo: [NSLocalizedDescriptionKey: "DBを開けませんでした"]) 
         }
         exec("PRAGMA journal_mode=WAL;")
         exec("PRAGMA synchronous=NORMAL;")
@@ -37,31 +38,52 @@ final class ChunkStore {
 
     /// 1件INSERT（トランザクション不要の単発）
     func insert(text: String, startedAt: Date, endedAt: Date) {
-        let sql = "INSERT INTO chunks(started_at, ended_at, text) VALUES(?, ?, ?);"
-        var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return }
-        sqlite3_bind_double(stmt, 1, startedAt.timeIntervalSince1970)
-        sqlite3_bind_double(stmt, 2, endedAt.timeIntervalSince1970)
-        text.withCString { cstr in
-            sqlite3_bind_text(stmt, 3, cstr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+        q.async { [weak self] in
+            guard let self = self else { return }
+            let sql = "INSERT INTO chunks(started_at, ended_at, text) VALUES(?, ?, ?);"
+            var stmt: OpaquePointer?
+            guard sqlite3_prepare_v2(self.db, sql, -1, &stmt, nil) == SQLITE_OK else {
+                self.logError(prefix: "prepare insert")
+                return
+            }
+            sqlite3_bind_double(stmt, 1, startedAt.timeIntervalSince1970)
+            sqlite3_bind_double(stmt, 2, endedAt.timeIntervalSince1970)
+            text.withCString { cstr in
+                sqlite3_bind_text(stmt, 3, cstr, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+            }
+            if sqlite3_step(stmt) != SQLITE_DONE {
+                self.logError(prefix: "step insert")
+            }
+            let rc = sqlite3_finalize(stmt)
+            if rc != SQLITE_OK { self.logError(prefix: "finalize insert rc=\(rc)") }
         }
-        sqlite3_step(stmt)
-        sqlite3_finalize(stmt)
     }
 
-    /// デバッグ用：最新10件を返す
-    func latest(limit: Int = 10) -> [(Date, String)] {
+    /// 非同期：最新N件をメインスレッドへ返す（ended_at DESC）
+    func latest(limit: Int = 10, completion: @escaping ([(Date, String)]) -> Void) {
+        q.async { [weak self] in
+            let rows = self?.latestSync(limit: limit) ?? []
+            DispatchQueue.main.async { completion(rows) }
+        }
+    }
+
+    /// 同期版（内部用）
+    private func latestSync(limit: Int = 10) -> [(Date, String)] {
         var rows: [(Date, String)] = []
-        let sql = "SELECT ended_at, text FROM chunks ORDER BY id DESC LIMIT ?;"
+        let sql = "SELECT ended_at, text FROM chunks ORDER BY ended_at DESC LIMIT ?;"
         var stmt: OpaquePointer?
-        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else { return rows }
+        guard sqlite3_prepare_v2(db, sql, -1, &stmt, nil) == SQLITE_OK else {
+            logError(prefix: "prepare latest")
+            return rows
+        }
         sqlite3_bind_int(stmt, 1, Int32(limit))
         while sqlite3_step(stmt) == SQLITE_ROW {
             let ts = sqlite3_column_double(stmt, 0)
             let txt = String(cString: sqlite3_column_text(stmt, 1))
             rows.append((Date(timeIntervalSince1970: ts), txt))
         }
-        sqlite3_finalize(stmt)
+        let rc = sqlite3_finalize(stmt)
+        if rc != SQLITE_OK { logError(prefix: "finalize latest rc=\(rc)") }
         return rows
     }
 
@@ -71,6 +93,14 @@ final class ChunkStore {
         if sqlite3_exec(db, sql, nil, nil, &err) != SQLITE_OK {
             if let e = err { print("SQLite error:", String(cString: e)) }
             sqlite3_free(err)
+        }
+    }
+
+    private func logError(prefix: String) {
+        if let db {
+            if let cStr = sqlite3_errmsg(db) { print("SQLite error [\(prefix)]:", String(cString: cStr)) }
+        } else {
+            print("SQLite error [\(prefix)]: db=nil")
         }
     }
 }

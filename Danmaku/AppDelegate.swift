@@ -86,7 +86,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             (kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String): true as CFBoolean
         ] as CFDictionary
         let trusted = AXIsProcessTrustedWithOptions(opts)
-        Log.input.info(trusted ? "accessibility granted" : "accessibility not granted")
+        if trusted {
+            Log.input.info("accessibility granted")
+        } else {
+            Log.input.info("accessibility not granted")
+        }
         // 権限が無ければ一時的にInput Insertionを無効化（ユーザ設定は尊重しつつ安全側に）
         if !trusted {
             DanmakuPrefs.inputInjectionEnabled = false

@@ -13,6 +13,11 @@ struct DanmakuPrefs {
         static let baselineY = "danmaku.baselineY"
     }
 
+    // Allowed ranges (hard guards)
+    private static let speedRange: ClosedRange<CGFloat> = 20.0...150.0
+    private static let fontRange: ClosedRange<CGFloat> = 14.0...48.0
+    private static let baselineRange: ClosedRange<CGFloat> = 40.0...300.0
+
     static func registerDefaults() {
         UserDefaults.standard.register(defaults: [
             Keys.speed: 60.0,
@@ -27,7 +32,8 @@ struct DanmakuPrefs {
             return v == 0 ? 60 : CGFloat(v)
         }
         set {
-            UserDefaults.standard.set(Double(newValue), forKey: Keys.speed)
+            let clamped = min(max(newValue, speedRange.lowerBound), speedRange.upperBound)
+            UserDefaults.standard.set(Double(clamped), forKey: Keys.speed)
             NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
         }
     }
@@ -38,7 +44,8 @@ struct DanmakuPrefs {
             return v == 0 ? 28 : CGFloat(v)
         }
         set {
-            UserDefaults.standard.set(Double(newValue), forKey: Keys.fontSize)
+            let clamped = min(max(newValue, fontRange.lowerBound), fontRange.upperBound)
+            UserDefaults.standard.set(Double(clamped), forKey: Keys.fontSize)
             NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
         }
     }
@@ -49,7 +56,8 @@ struct DanmakuPrefs {
             return v == 0 ? 80 : CGFloat(v)
         }
         set {
-            UserDefaults.standard.set(Double(newValue), forKey: Keys.baselineY)
+            let clamped = min(max(newValue, baselineRange.lowerBound), baselineRange.upperBound)
+            UserDefaults.standard.set(Double(clamped), forKey: Keys.baselineY)
             NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
         }
     }

@@ -1,4 +1,5 @@
 import Cocoa
+import ApplicationServices
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuBar: MenuBarController!
@@ -35,29 +36,60 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
             do { try self.transcriber.start() }
-            catch { self.showAlert(message: "開始できません", info: "\(error)") }
+            catch {
+                Log.stt.error("start failed: \(error.localizedDescription, privacy: .public)")
+                self.showAlert(message: "開始できません", info: "\(error)")
+            }
         }
         NotificationCenter.default.addObserver(forName: .danmakuStop, object: nil, queue: .main) { [weak self] _ in
             self?.transcriber.stop()
         }
 
-        // 確定チャンクを保存
+        // 確定チャンクを保存（userInfo 形式/ object 辞書 両対応）
         NotificationCenter.default.addObserver(forName: .danmakuChunk, object: nil, queue: .main) { [weak self] n in
-            guard
-                let text = n.userInfo?["text"] as? String,
-                let started = n.userInfo?["startedAt"] as? Date,
-                let ended = n.userInfo?["endedAt"] as? Date
-            else { return }
-            self?.store.insert(text: text, startedAt: started, endedAt: ended)
+            var text: String?
+            var started: Date?
+            var ended: Date?
+            if let ui = n.userInfo {
+                text = ui["text"] as? String
+                started = ui["startedAt"] as? Date
+                ended = ui["endedAt"] as? Date
+            } else if let obj = n.object as? [String: Any] {
+                text = obj["text"] as? String
+                started = obj["startedAt"] as? Date
+                ended = obj["endedAt"] as? Date
+            }
+            guard let t = text, let s = started, let e = ended else { return }
+            self?.store.insert(text: t, startedAt: s, endedAt: e)
+            Log.db.info("chunk saved len=\(t.count, privacy: .public)")
+            if DanmakuPrefs.inputInjectionEnabled {
+                InputInjector.type(t + "\n")
+            }
         }
 
         // デバッグ: 最新10件をコンソールにダンプ
         NotificationCenter.default.addObserver(forName: .danmakuDumpLatest, object: nil, queue: .main) { [weak self] _ in
             self?.store.latest(limit: 10) { rows in
+                let f = ISO8601DateFormatter(); f.timeZone = TimeZone(secondsFromGMT: 0)
                 for (date, text) in rows {
-                    print(String(describing: date), text)
+                    print("\(f.string(from: date)) \(text)")
                 }
             }
+        }
+
+        // アクセシビリティ権限の促し（自動投入の前提）
+        ensureAccessibilityPermission()
+    }
+
+    private func ensureAccessibilityPermission() {
+        let opts: CFDictionary = [
+            (kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String): true as CFBoolean
+        ] as CFDictionary
+        let trusted = AXIsProcessTrustedWithOptions(opts)
+        Log.input.info(trusted ? "accessibility granted" : "accessibility not granted")
+        // 権限が無ければ一時的にInput Insertionを無効化（ユーザ設定は尊重しつつ安全側に）
+        if !trusted {
+            DanmakuPrefs.inputInjectionEnabled = false
         }
     }
 

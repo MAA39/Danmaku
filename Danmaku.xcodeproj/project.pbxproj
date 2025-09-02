@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0CFA74552E66BC6400962CDD /* Speech.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CFA74542E66BC6400962CDD /* Speech.framework */; };
+		0CFA74572E66BC7700962CDD /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CFA74562E66BC7700962CDD /* AVFoundation.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0CFA74372E66BBCE00962CDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,11 +32,26 @@
 		0CFA74282E66BBCC00962CDD /* Danmaku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Danmaku.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CFA74362E66BBCE00962CDD /* DanmakuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DanmakuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CFA74402E66BBCE00962CDD /* DanmakuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DanmakuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CFA74542E66BC6400962CDD /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
+		0CFA74562E66BC7700962CDD /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0CFA74592E66BCFA00962CDD /* Exceptions for "Danmaku" folder in "Danmaku" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0CFA74272E66BBCC00962CDD /* Danmaku */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0CFA742A2E66BBCC00962CDD /* Danmaku */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0CFA74592E66BCFA00962CDD /* Exceptions for "Danmaku" folder in "Danmaku" target */,
+			);
 			path = Danmaku;
 			sourceTree = "<group>";
 		};
@@ -52,6 +72,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CFA74572E66BC7700962CDD /* AVFoundation.framework in Frameworks */,
+				0CFA74552E66BC6400962CDD /* Speech.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +100,7 @@
 				0CFA742A2E66BBCC00962CDD /* Danmaku */,
 				0CFA74392E66BBCE00962CDD /* DanmakuTests */,
 				0CFA74432E66BBCE00962CDD /* DanmakuUITests */,
+				0CFA74532E66BC6400962CDD /* Frameworks */,
 				0CFA74292E66BBCC00962CDD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +113,15 @@
 				0CFA74402E66BBCE00962CDD /* DanmakuUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0CFA74532E66BC6400962CDD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0CFA74562E66BC7700962CDD /* AVFoundation.framework */,
+				0CFA74542E66BC6400962CDD /* Speech.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -402,6 +434,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Danmaku/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -429,6 +462,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Danmaku/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

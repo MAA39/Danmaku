@@ -1,167 +1,213 @@
 import Foundation
 import AVFoundation
 import Speech
+import QuartzCore
 import Accelerate
 
-/// 音声認識の開始/停止、権限、オンデバイス可否チェックを一元管理するコーディネータ。
-/// - 認識は **オンデバイス必須**（supportsOnDeviceRecognition=false なら開始しない）
-/// - 中間結果は画面に出さず、**確定テキストのみ**を .danmakuChunk 通知で投げる
+/// 安定した音声→STT配線（bus 0 に tap → engine start → recognition 開始）
 final class TranscriptionCoordinator {
-    // MARK: - Public API
-
-    /// 起動時に一回だけ呼ぶ。権限の事前確認を済ませる。
+    // MARK: - Lifecycle / Auth
     func prepare(completion: @escaping (Result<Void, Error>) -> Void) {
         SFSpeechRecognizer.requestAuthorization { status in
             switch status {
-            case .authorized:
-                completion(.success(()))
-            case .denied:
-                completion(.failure(TranscriptionError.permissionDenied("音声認識の許可が必要です")))
-            case .restricted, .notDetermined:
-                completion(.failure(TranscriptionError.permissionDenied("音声認識がこのMacで利用できません")))
-            @unknown default:
-                completion(.failure(TranscriptionError.unknown))
+            case .authorized: completion(.success(()))
+            case .denied: completion(.failure(TranscriptionError.permissionDenied("音声認可が必要です")))
+            case .restricted, .notDetermined: completion(.failure(TranscriptionError.permissionDenied("音声認識がこのMacで利用できません")))
+            @unknown default: completion(.failure(TranscriptionError.unknown))
             }
         }
     }
 
-    /// 開始（オンデバイス不可や権限不足ならアラートを推奨）
+    var isOnDeviceSupported: Bool { recognizer?.supportsOnDeviceRecognition ?? false }
+
+    // MARK: - Start/Stop
     func start() throws {
-        guard isOnDeviceSupported else {
-            throw TranscriptionError.onDeviceUnsupported("オンデバイス音声認識に未対応の端末/OSです")
-        }
-        try configureSessionIfNeeded()
-        recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-        recognitionRequest?.shouldReportPartialResults = true
-        recognitionRequest?.requiresOnDeviceRecognition = true  // ←ここが肝
+        Log.stt.info("start requested")
+        stop() // idempotent
 
-        guard let recognizer = recognizer, recognizer.isAvailable else {
-            throw TranscriptionError.unavailable("音声認識サービスが現在利用できません")
-        }
-
-        // 既存タスク掃除
-        recognitionTask?.cancel(); recognitionTask = nil
-        currentChunkStart = nil
-
-        // マイク音声を流し込む
-        let input = audioEngine.inputNode
-        let format = input.outputFormat(forBus: 0)
-        input.removeTap(onBus: 0)
-        input.installTap(onBus: 0, bufferSize: 2048, format: format) { [weak self] buffer, _ in
-            self?.recognitionRequest?.append(buffer)
-            self?.handleSilence(buffer: buffer, format: format) // 無音監視（Step6/7で活用）
-        }
-
-        try audioEngine.start()
-
-        // 認識コールバック：確定だけ束ねて吐く
-        recognitionTask = recognizer.recognitionTask(with: recognitionRequest!) { [weak self] result, error in
-            guard let self else { return }
-            if let r = result, r.isFinal {
-                let text = r.bestTranscription.formattedString.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !text.isEmpty {
-                    let started = self.currentChunkStart ?? Date()
-                    let ended = Date()
-                    NotificationCenter.default.post(name: .danmakuChunk, object: nil, userInfo: [
-                        "text": text,
-                        "startedAt": started,
-                        "endedAt": ended
-                    ])
-                }
-                self.currentChunkStart = nil
-                self.flushSilenceState()
-            }
-            if error != nil {
-                self.stop() // エラー時は安全に停止
-            }
-        }
-    }
-
-    /// 停止
-    func stop() {
-        audioEngine.stop()
-        audioEngine.inputNode.removeTap(onBus: 0)
-        recognitionRequest?.endAudio()
-        recognitionTask?.cancel()
-        recognitionRequest = nil
-        recognitionTask = nil
-        flushSilenceState()
-        currentChunkStart = nil
-    }
-
-    // MARK: - On-device support
-
-    /// このMacが「日本語のオンデバイス認識」をサポートしているか
-    var isOnDeviceSupported: Bool {
-        recognizer?.supportsOnDeviceRecognition ?? false
-    }
-
-    // MARK: - Private
-
-    private let audioEngine = AVAudioEngine()
-    private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))
-    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
-    private var recognitionTask: SFSpeechRecognitionTask?
-
-    // 無音検出（移動平均で ~2s 無音を検知）
-    private var silenceWindow: [Float] = []
-    private var lastVoiceAt: TimeInterval = Date.timeIntervalSinceReferenceDate
-    private let silenceThresholdDb: Float = -45  // だいたいこの辺（端末次第で微調整）
-    private let silenceCutSeconds: TimeInterval = 2.0
-
-    // チャンクの開始推定（音が戻った瞬間を開始とみなす）
-    private var currentChunkStart: Date? = nil
-
-    private func configureSessionIfNeeded() throws {
+        // macOS: AVAudioSession は不要
         #if os(iOS)
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.record, mode: .measurement, options: [.duckOthers])
         try session.setActive(true, options: .notifyOthersOnDeactivation)
-        #else
-        // macOS では特に設定不要
         #endif
+
+        let req = SFSpeechAudioBufferRecognitionRequest()
+        req.shouldReportPartialResults = true
+        if #available(macOS 12.0, *) { req.requiresOnDeviceRecognition = true }
+        request = req
+
+        let input = audioEngine.inputNode
+        let format = input.inputFormat(forBus: 0)
+        input.removeTap(onBus: 0)
+        input.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
+            guard let self else { return }
+            self.request?.append(buffer)
+            // RMSヒステリシスで無音を判定
+            if let ch = buffer.floatChannelData?[0] {
+                let count = Int(buffer.frameLength)
+                var rms: Float = 0
+                vDSP_rmsqv(ch, 1, &rms, vDSP_Length(count))
+                if !rms.isFinite { rms = 0 }
+                self.rmsMovingAvg = self.rmsMovingAvg * 0.8 + rms * 0.2
+                let frameSec = Double(buffer.frameLength) / format.sampleRate
+                if self.rmsMovingAvg < self.silenceRmsThreshold {
+                    self.silentConsecutiveCount += 1
+                } else {
+                    self.silentConsecutiveCount = 0
+                }
+                let silentSeconds = Double(self.silentConsecutiveCount) * frameSec
+                let gap = DanmakuPrefs.silenceGapSec
+                if self.hasActiveUtterance && silentSeconds >= gap {
+                    self.finishChunk(with: nil)
+                    self.silentConsecutiveCount = 0
+                }
+            }
+        }
+
+        audioEngine.prepare()
+        try audioEngine.start()
+        Log.audio.info("audioEngine started: \(self.audioEngine.isRunning, privacy: .public)")
+
+        recognitionTask = recognizer?.recognitionTask(with: req) { [weak self] result, error in
+            guard let self else { return }
+            if let r = result {
+                let full = r.bestTranscription.formattedString
+                if !full.isEmpty {
+                    // 差分抽出：共通接頭辞を除いた「新規末尾」だけを取り出す
+                    let prefixLen = full.commonPrefix(with: lastPartialFull).count
+                    let startIdx = full.index(full.startIndex, offsetBy: prefixLen)
+                    var suffix = String(full[startIdx...])
+                    // 空白のみは破棄（ノイズ除去）
+                    suffix = suffix.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                    let now = CACurrentMediaTime()
+                    if !suffix.isEmpty && suffix.count >= minEmitChars && (now - lastEmitAt) >= minEmitGap {
+                        // 発話ID開始/ストラグラー抑止
+                        if !hasActiveUtterance {
+                            if (now - lastFinalizeAt) < 0.30 {
+                                // 確定直後300msは遅延パーシャルを無視
+                                return
+                            }
+                            currentUtteranceID &+= 1
+                            hasActiveUtterance = true
+                            if self.currentChunkStartDate == nil { self.currentChunkStartDate = Date() }
+                        }
+                        // オーバーレイは "全文" を更新（伸び続ける体感）。ログは差分を表示。
+                        NotificationCenter.default.post(name: .danmakuPartialText, object: nil, userInfo: [
+                            "text": full,
+                            "utteranceID": currentUtteranceID
+                        ])
+                        Log.stt.debug("partial diff: \"\(suffix, privacy: .public)\"")
+                        lastEmitAt = now
+                    }
+                    lastPartialFull = full
+
+                    self.lastTextTimestamp = CACurrentMediaTime()
+                    if self.currentChunkStartDate == nil { self.currentChunkStartDate = Date() }
+                }
+                if r.isFinal {
+                    self.finishChunk(with: r.bestTranscription.formattedString)
+                }
+            }
+            if let e = error {
+                Log.stt.error("recognition error: \(e.localizedDescription, privacy: .public)")
+            }
+        }
+
+        scheduleSilenceTick()
     }
 
-    private func handleSilence(buffer: AVAudioPCMBuffer, format: AVAudioFormat) {
-        guard let ch = buffer.floatChannelData?[0] else { return }
-        let count = Int(buffer.frameLength)
-        var rms: Float = 0
-        vDSP_rmsqv(ch, 1, &rms, vDSP_Length(count))
-        var db = 20 * log10f(rms)
-        if !db.isFinite { db = -100 }
+    func stop() {
+        Log.stt.info("stop requested")
+        recognitionTask?.cancel(); recognitionTask = nil
+        request?.endAudio(); request = nil
+        if audioEngine.isRunning {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            audioEngine.stop()
+        }
+        #if os(iOS)
+        try? AVAudioSession.sharedInstance().setActive(false)
+        #endif
+        currentChunkStartDate = nil
+        hasActiveUtterance = false
+        lastPartialFull = ""
+        silentConsecutiveCount = 0
+    }
 
-        // 移動平均（8サンプル程度）
-        silenceWindow.append(db); if silenceWindow.count > 8 { silenceWindow.removeFirst() }
-        let avg = silenceWindow.reduce(0, +) / Float(silenceWindow.count)
-
-        if avg > silenceThresholdDb {
-            if currentChunkStart == nil { currentChunkStart = Date() }
-            lastVoiceAt = Date.timeIntervalSinceReferenceDate
-        } else {
-            let now = Date.timeIntervalSinceReferenceDate
-            if now - lastVoiceAt > silenceCutSeconds {
-                // → 無音2秒：ここで認識の“確定”を待つ。r.isFinal 側で吐くためここは状態リセットのみ。
-                flushSilenceState()
-            }
+    // MARK: - Silence / Finalize
+    private func scheduleSilenceTick() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.silenceTick()
         }
     }
 
-    private func flushSilenceState() {
-        silenceWindow.removeAll(keepingCapacity: true)
-        lastVoiceAt = Date.timeIntervalSinceReferenceDate
+    private func silenceTick() {
+        let gap = DanmakuPrefs.silenceGapSec
+        let now = CACurrentMediaTime()
+        if currentChunkStartDate != nil, (now - lastTextTimestamp) >= gap {
+            finishChunk(with: nil)
+        }
+        scheduleSilenceTick()
     }
+
+    private func finishChunk(with text: String?) {
+        // textがnilなら、最後に観測した全文(lastPartialFull)を採用
+        let candidateA = text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let candidateB = lastPartialFull.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalText: String? = {
+            if let a = candidateA, a.isEmpty == false { return a }
+            return candidateB.isEmpty ? nil : candidateB
+        }()
+
+        guard let startedAt = currentChunkStartDate else {
+            currentChunkStartDate = nil
+            hasActiveUtterance = false
+            return
+        }
+        guard let s = finalText else {
+            currentChunkStartDate = nil
+            hasActiveUtterance = false
+            lastPartialFull = ""
+            lastFinalizeAt = CACurrentMediaTime()
+            return
+        }
+
+        let endedAt = Date()
+        NotificationCenter.default.post(name: .danmakuChunk, object: nil, userInfo: [
+            "text": s,
+            "startedAt": startedAt,
+            "endedAt": endedAt,
+            "utteranceID": currentUtteranceID
+        ])
+        Log.stt.info("final chunk: \(s, privacy: .public)")
+        // 次のチャンクに備える
+        currentChunkStartDate = nil
+        hasActiveUtterance = false
+        lastPartialFull = ""
+        lastFinalizeAt = CACurrentMediaTime()
+    }
+
+    // MARK: - Internals
+    private let audioEngine = AVAudioEngine()
+    private var recognitionTask: SFSpeechRecognitionTask?
+    private var request: SFSpeechAudioBufferRecognitionRequest?
+    private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))
+    private var lastTextTimestamp: TimeInterval = 0
+    private var currentChunkStartDate: Date?
+    private var currentUtteranceID: Int = 0
+    private var hasActiveUtterance: Bool = false
+    private var lastFinalizeAt: CFTimeInterval = 0
+    // 無音ヒステリシス
+    private var silentConsecutiveCount: Int = 0
+    private var rmsMovingAvg: Float = 0
+    private let silenceRmsThreshold: Float = 0.006 // ~ -45dB
+
+    // --- partial coalescing state ---
+    private var lastPartialFull: String = ""
+    private var lastEmitAt: CFTimeInterval = 0
+    private let minEmitChars = 1
+    private let minEmitGap: CFTimeInterval = 0.15 // 150 ms for snappy partials
 }
 
-// MARK: - Errors & Notifications
-
-enum TranscriptionError: Error {
-    case permissionDenied(String)
-    case onDeviceUnsupported(String)
-    case unavailable(String)
-    case unknown
-}
-
-extension Notification.Name {
-    /// 確定チャンクができたときに text を userInfo["text"] で投げる
-    static let danmakuChunk = Notification.Name("danmaku.chunk")
-}
+enum TranscriptionError: Error { case permissionDenied(String); case onDeviceUnsupported(String); case unavailable(String); case unknown }

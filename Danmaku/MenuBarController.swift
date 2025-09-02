@@ -26,11 +26,31 @@ final class MenuBarController: NSObject {
 
         menu.addItem(.separator())
 
+        let prefs = NSMenuItem(title: "Preferences…", action: #selector(didTapPreferences), keyEquivalent: ",")
+        prefs.keyEquivalentModifierMask = [.command]
+        prefs.target = self
+        menu.addItem(prefs)
+
+        let dump = NSMenuItem(title: "Dump Latest 10 (Console)", action: #selector(didTapDumpLatest), keyEquivalent: "d")
+        dump.keyEquivalentModifierMask = [.command, .shift]
+        dump.target = self
+        menu.addItem(dump)
+
+        menu.addItem(.separator())
+
         let quit = NSMenuItem(title: "Quit", action: #selector(didTapQuit), keyEquivalent: "q")
         quit.keyEquivalentModifierMask = [.command]
         quit.target = self
         menu.addItem(quit)
         return menu
+    }
+
+    @objc private func didTapPreferences() {
+        PreferencesWindowController.shared.show()
+    }
+
+    @objc private func didTapDumpLatest() {
+        NotificationCenter.default.post(name: .danmakuDumpLatest, object: nil)
     }
 
     @objc private func didTapStart() {

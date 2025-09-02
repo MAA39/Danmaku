@@ -3,7 +3,9 @@ import QuartzCore
 
 final class OverlayWindow: NSWindow {
     private let contentContainer = NSView()
-    private var nextYOffset: CGFloat = 180 // 画面上部からのオフセット（見えない場合は220など調整）
+    private var rowOffset: CGFloat = 0 // 行ごとのオフセット
+    private let rowStep: CGFloat = 44
+    private let maxRows: CGFloat = 3
 
     convenience init() {
         let screen = NSScreen.main?.frame ?? .zero
@@ -29,6 +31,11 @@ final class OverlayWindow: NSWindow {
             guard let text = note.userInfo?["text"] as? String, !text.isEmpty else { return }
             self?.spawn(text: text)
         }
+
+        NotificationCenter.default.addObserver(forName: .danmakuPrefsChanged, object: nil, queue: .main) { [weak self] _ in
+            // 設定変更に応じて行オフセットを軽くリセット
+            self?.rowOffset = 0
+        }
     }
 
     func spawn(text: String) {
@@ -39,20 +46,23 @@ final class OverlayWindow: NSWindow {
         // テキストレイヤ
         let textLayer = CATextLayer()
         textLayer.contentsScale = NSScreen.main?.backingScaleFactor ?? 2
+        let fontSize = DanmakuPrefs.fontSize
+        let font = NSFont.systemFont(ofSize: fontSize, weight: .semibold)
         textLayer.string = NSAttributedString(
             string: text,
             attributes: [
-                .font: NSFont.systemFont(ofSize: 28, weight: .semibold),
+                .font: font,
                 .foregroundColor: NSColor.white
             ]
         )
-        let textSize = (text as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: 28, weight: .semibold)])
+        let textSize = (text as NSString).size(withAttributes: [.font: font])
         let height = ceil(textSize.height)
         let width = max(ceil(textSize.width) + 24, 120)
 
-        let y = min(max(frame.height - nextYOffset, 20), frame.height - height - 20)
-        nextYOffset += 44
-        if nextYOffset > 260 { nextYOffset = 180 }
+        let topInset = DanmakuPrefs.baselineY
+        let y = min(max(frame.height - (topInset + rowOffset), 20), frame.height - height - 20)
+        rowOffset += rowStep
+        if rowOffset >= rowStep * maxRows { rowOffset = 0 }
 
         textLayer.frame = CGRect(x: startX, y: y, width: width, height: height)
         textLayer.alignmentMode = .left
@@ -68,7 +78,7 @@ final class OverlayWindow: NSWindow {
         // 右→左 へゆっくり流す
         let endX = -width - 40
         let distance = startX - endX
-        let speed: CGFloat = 60 // px/s
+        let speed: CGFloat = DanmakuPrefs.speed // px/s
         let duration = CFTimeInterval(distance / speed)
 
         let animation = CABasicAnimation(keyPath: "position.x")

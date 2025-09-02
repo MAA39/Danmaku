@@ -41,6 +41,7 @@ final class TranscriptionCoordinator {
 
         // 既存タスク掃除
         recognitionTask?.cancel(); recognitionTask = nil
+        currentChunkStart = nil
 
         // マイク音声を流し込む
         let input = audioEngine.inputNode
@@ -48,7 +49,7 @@ final class TranscriptionCoordinator {
         input.removeTap(onBus: 0)
         input.installTap(onBus: 0, bufferSize: 2048, format: format) { [weak self] buffer, _ in
             self?.recognitionRequest?.append(buffer)
-            self?.handleSilence(buffer: buffer, format: format) // 無音監視（Step6で活用）
+            self?.handleSilence(buffer: buffer, format: format) // 無音監視（Step6/7で活用）
         }
 
         try audioEngine.start()
@@ -56,17 +57,19 @@ final class TranscriptionCoordinator {
         // 認識コールバック：確定だけ束ねて吐く
         recognitionTask = recognizer.recognitionTask(with: recognitionRequest!) { [weak self] result, error in
             guard let self else { return }
-            if let r = result {
-                // isFinal で一区切り：確定文だけ通知
-                if r.isFinal {
-                    let text = r.bestTranscription.formattedString.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if text.isEmpty == false {
-                        NotificationCenter.default.post(name: .danmakuChunk,
-                                                        object: nil,
-                                                        userInfo: ["text": text])
-                    }
-                    self.flushSilenceState()
+            if let r = result, r.isFinal {
+                let text = r.bestTranscription.formattedString.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !text.isEmpty {
+                    let started = self.currentChunkStart ?? Date()
+                    let ended = Date()
+                    NotificationCenter.default.post(name: .danmakuChunk, object: nil, userInfo: [
+                        "text": text,
+                        "startedAt": started,
+                        "endedAt": ended
+                    ])
                 }
+                self.currentChunkStart = nil
+                self.flushSilenceState()
             }
             if error != nil {
                 self.stop() // エラー時は安全に停止
@@ -83,6 +86,7 @@ final class TranscriptionCoordinator {
         recognitionRequest = nil
         recognitionTask = nil
         flushSilenceState()
+        currentChunkStart = nil
     }
 
     // MARK: - On-device support
@@ -104,6 +108,9 @@ final class TranscriptionCoordinator {
     private var lastVoiceAt: TimeInterval = Date.timeIntervalSinceReferenceDate
     private let silenceThresholdDb: Float = -45  // だいたいこの辺（端末次第で微調整）
     private let silenceCutSeconds: TimeInterval = 2.0
+
+    // チャンクの開始推定（音が戻った瞬間を開始とみなす）
+    private var currentChunkStart: Date? = nil
 
     private func configureSessionIfNeeded() throws {
         #if os(iOS)
@@ -128,6 +135,7 @@ final class TranscriptionCoordinator {
         let avg = silenceWindow.reduce(0, +) / Float(silenceWindow.count)
 
         if avg > silenceThresholdDb {
+            if currentChunkStart == nil { currentChunkStart = Date() }
             lastVoiceAt = Date.timeIntervalSinceReferenceDate
         } else {
             let now = Date.timeIntervalSinceReferenceDate

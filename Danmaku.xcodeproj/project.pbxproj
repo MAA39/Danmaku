@@ -1,0 +1,556 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		0CFA74372E66BBCE00962CDD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CFA74202E66BBCC00962CDD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CFA74272E66BBCC00962CDD;
+			remoteInfo = Danmaku;
+		};
+		0CFA74412E66BBCE00962CDD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0CFA74202E66BBCC00962CDD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CFA74272E66BBCC00962CDD;
+			remoteInfo = Danmaku;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0CFA74282E66BBCC00962CDD /* Danmaku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Danmaku.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CFA74362E66BBCE00962CDD /* DanmakuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DanmakuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CFA74402E66BBCE00962CDD /* DanmakuUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DanmakuUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		0CFA742A2E66BBCC00962CDD /* Danmaku */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Danmaku;
+			sourceTree = "<group>";
+		};
+		0CFA74392E66BBCE00962CDD /* DanmakuTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DanmakuTests;
+			sourceTree = "<group>";
+		};
+		0CFA74432E66BBCE00962CDD /* DanmakuUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DanmakuUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0CFA74252E66BBCC00962CDD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0CFA74332E66BBCE00962CDD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0CFA743D2E66BBCE00962CDD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0CFA741F2E66BBCC00962CDD = {
+			isa = PBXGroup;
+			children = (
+				0CFA742A2E66BBCC00962CDD /* Danmaku */,
+				0CFA74392E66BBCE00962CDD /* DanmakuTests */,
+				0CFA74432E66BBCE00962CDD /* DanmakuUITests */,
+				0CFA74292E66BBCC00962CDD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0CFA74292E66BBCC00962CDD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0CFA74282E66BBCC00962CDD /* Danmaku.app */,
+				0CFA74362E66BBCE00962CDD /* DanmakuTests.xctest */,
+				0CFA74402E66BBCE00962CDD /* DanmakuUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0CFA74272E66BBCC00962CDD /* Danmaku */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CFA744A2E66BBCE00962CDD /* Build configuration list for PBXNativeTarget "Danmaku" */;
+			buildPhases = (
+				0CFA74242E66BBCC00962CDD /* Sources */,
+				0CFA74252E66BBCC00962CDD /* Frameworks */,
+				0CFA74262E66BBCC00962CDD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0CFA742A2E66BBCC00962CDD /* Danmaku */,
+			);
+			name = Danmaku;
+			packageProductDependencies = (
+			);
+			productName = Danmaku;
+			productReference = 0CFA74282E66BBCC00962CDD /* Danmaku.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0CFA74352E66BBCE00962CDD /* DanmakuTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CFA744D2E66BBCE00962CDD /* Build configuration list for PBXNativeTarget "DanmakuTests" */;
+			buildPhases = (
+				0CFA74322E66BBCE00962CDD /* Sources */,
+				0CFA74332E66BBCE00962CDD /* Frameworks */,
+				0CFA74342E66BBCE00962CDD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0CFA74382E66BBCE00962CDD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				0CFA74392E66BBCE00962CDD /* DanmakuTests */,
+			);
+			name = DanmakuTests;
+			packageProductDependencies = (
+			);
+			productName = DanmakuTests;
+			productReference = 0CFA74362E66BBCE00962CDD /* DanmakuTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0CFA743F2E66BBCE00962CDD /* DanmakuUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CFA74502E66BBCE00962CDD /* Build configuration list for PBXNativeTarget "DanmakuUITests" */;
+			buildPhases = (
+				0CFA743C2E66BBCE00962CDD /* Sources */,
+				0CFA743D2E66BBCE00962CDD /* Frameworks */,
+				0CFA743E2E66BBCE00962CDD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0CFA74422E66BBCE00962CDD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				0CFA74432E66BBCE00962CDD /* DanmakuUITests */,
+			);
+			name = DanmakuUITests;
+			packageProductDependencies = (
+			);
+			productName = DanmakuUITests;
+			productReference = 0CFA74402E66BBCE00962CDD /* DanmakuUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0CFA74202E66BBCC00962CDD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					0CFA74272E66BBCC00962CDD = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					0CFA74352E66BBCE00962CDD = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 0CFA74272E66BBCC00962CDD;
+					};
+					0CFA743F2E66BBCE00962CDD = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 0CFA74272E66BBCC00962CDD;
+					};
+				};
+			};
+			buildConfigurationList = 0CFA74232E66BBCC00962CDD /* Build configuration list for PBXProject "Danmaku" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 0CFA741F2E66BBCC00962CDD;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0CFA74292E66BBCC00962CDD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0CFA74272E66BBCC00962CDD /* Danmaku */,
+				0CFA74352E66BBCE00962CDD /* DanmakuTests */,
+				0CFA743F2E66BBCE00962CDD /* DanmakuUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0CFA74262E66BBCC00962CDD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0CFA74342E66BBCE00962CDD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0CFA743E2E66BBCE00962CDD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0CFA74242E66BBCC00962CDD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0CFA74322E66BBCE00962CDD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0CFA743C2E66BBCE00962CDD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0CFA74382E66BBCE00962CDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CFA74272E66BBCC00962CDD /* Danmaku */;
+			targetProxy = 0CFA74372E66BBCE00962CDD /* PBXContainerItemProxy */;
+		};
+		0CFA74422E66BBCE00962CDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CFA74272E66BBCC00962CDD /* Danmaku */;
+			targetProxy = 0CFA74412E66BBCE00962CDD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0CFA74482E66BBCE00962CDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		0CFA74492E66BBCE00962CDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		0CFA744B2E66BBCE00962CDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Danmaku/Danmaku.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masakazu.Danmaku;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		0CFA744C2E66BBCE00962CDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Danmaku/Danmaku.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masakazu.Danmaku;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		0CFA744E2E66BBCE00962CDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masakazu.DanmakuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Danmaku.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Danmaku";
+			};
+			name = Debug;
+		};
+		0CFA744F2E66BBCE00962CDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masakazu.DanmakuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Danmaku.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Danmaku";
+			};
+			name = Release;
+		};
+		0CFA74512E66BBCE00962CDD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masakazu.DanmakuUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Danmaku;
+			};
+			name = Debug;
+		};
+		0CFA74522E66BBCE00962CDD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7VZ6A4CJTG;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.masakazu.DanmakuUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = Danmaku;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0CFA74232E66BBCC00962CDD /* Build configuration list for PBXProject "Danmaku" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CFA74482E66BBCE00962CDD /* Debug */,
+				0CFA74492E66BBCE00962CDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0CFA744A2E66BBCE00962CDD /* Build configuration list for PBXNativeTarget "Danmaku" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CFA744B2E66BBCE00962CDD /* Debug */,
+				0CFA744C2E66BBCE00962CDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0CFA744D2E66BBCE00962CDD /* Build configuration list for PBXNativeTarget "DanmakuTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CFA744E2E66BBCE00962CDD /* Debug */,
+				0CFA744F2E66BBCE00962CDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0CFA74502E66BBCE00962CDD /* Build configuration list for PBXNativeTarget "DanmakuUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0CFA74512E66BBCE00962CDD /* Debug */,
+				0CFA74522E66BBCE00962CDD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0CFA74202E66BBCC00962CDD /* Project object */;
+}

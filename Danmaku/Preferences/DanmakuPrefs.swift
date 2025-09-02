@@ -11,6 +11,10 @@ struct DanmakuPrefs {
         static let speed = "danmaku.speed"
         static let fontSize = "danmaku.fontSize"
         static let baselineY = "danmaku.baselineY"
+        static let overlayTraverseSec = "danmaku.overlay.traverseSec"
+        static let overlayWidthFraction = "danmaku.overlay.widthFraction"
+        static let inputInjectionEnabled = "danmaku.input.injectionEnabled"
+        static let silenceGapSec = "danmaku.transcribe.silenceGapSec"
     }
 
     // Allowed ranges (hard guards)
@@ -23,6 +27,10 @@ struct DanmakuPrefs {
             Keys.speed: 60.0,
             Keys.fontSize: 28.0,
             Keys.baselineY: 80.0,
+            Keys.overlayTraverseSec: 5.0,
+            Keys.overlayWidthFraction: 0.6,
+            Keys.inputInjectionEnabled: false,
+            Keys.silenceGapSec: 1.0,
         ])
     }
 
@@ -58,6 +66,62 @@ struct DanmakuPrefs {
         set {
             let clamped = min(max(newValue, baselineRange.lowerBound), baselineRange.upperBound)
             UserDefaults.standard.set(Double(clamped), forKey: Keys.baselineY)
+            NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
+        }
+    }
+
+    // MARK: - New Settings (Task 2)
+
+    /// Overlay traverse duration in seconds (left→right). Range: 2.0 ... 12.0, Default: 5.0
+    static var overlayTraverseSec: Double {
+        get {
+            let v = UserDefaults.standard.double(forKey: Keys.overlayTraverseSec)
+            let d = (v == 0) ? 5.0 : v
+            return min(max(d, 2.0), 12.0)
+        }
+        set {
+            let clamped = min(max(newValue, 2.0), 12.0)
+            UserDefaults.standard.set(clamped, forKey: Keys.overlayTraverseSec)
+            NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
+        }
+    }
+
+    /// Overlay width as a fraction of screen width. Range: 0.3 ... 1.0, Default: 0.6
+    static var overlayWidthFraction: Double {
+        get {
+            let v = UserDefaults.standard.double(forKey: Keys.overlayWidthFraction)
+            let d = (v == 0) ? 0.6 : v
+            return min(max(d, 0.3), 1.0)
+        }
+        set {
+            let clamped = min(max(newValue, 0.3), 1.0)
+            UserDefaults.standard.set(clamped, forKey: Keys.overlayWidthFraction)
+            NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
+        }
+    }
+
+    /// When true, finalized chunk text is inserted into the currently focused input. Default: false
+    static var inputInjectionEnabled: Bool {
+        get {
+            if UserDefaults.standard.object(forKey: Keys.inputInjectionEnabled) == nil { return false }
+            return UserDefaults.standard.bool(forKey: Keys.inputInjectionEnabled)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.inputInjectionEnabled)
+            NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
+        }
+    }
+
+    /// Silence gap for chunk boundary (seconds). Range: 0.5 ... 5.0, Default: 2.0
+    static var silenceGapSec: Double {
+        get {
+            let v = UserDefaults.standard.double(forKey: Keys.silenceGapSec)
+            let d = (v == 0) ? 2.0 : v
+            return min(max(d, 0.5), 5.0)
+        }
+        set {
+            let clamped = min(max(newValue, 0.5), 5.0)
+            UserDefaults.standard.set(clamped, forKey: Keys.silenceGapSec)
             NotificationCenter.default.post(name: .danmakuPrefsChanged, object: nil)
         }
     }

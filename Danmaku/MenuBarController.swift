@@ -2,6 +2,8 @@ import Cocoa
 
 final class MenuBarController: NSObject {
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    private var startItem: NSMenuItem!
+    private var stopItem: NSMenuItem!
 
     override init() {
         super.init()
@@ -14,15 +16,17 @@ final class MenuBarController: NSObject {
 
     private func buildMenu() -> NSMenu {
         let menu = NSMenu()
-        let start = NSMenuItem(title: "Start Transcribe", action: #selector(didTapStart), keyEquivalent: "s")
-        start.keyEquivalentModifierMask = [.command]
-        start.target = self
-        menu.addItem(start)
+        startItem = NSMenuItem(title: "Start Transcribe", action: #selector(didTapStart), keyEquivalent: "s")
+        startItem.keyEquivalentModifierMask = [.command]
+        startItem.target = self
+        menu.addItem(startItem)
 
-        let stop = NSMenuItem(title: "Stop", action: #selector(didTapStop), keyEquivalent: "x")
-        stop.keyEquivalentModifierMask = [.command]
-        stop.target = self
-        menu.addItem(stop)
+        stopItem = NSMenuItem(title: "Stop", action: #selector(didTapStop), keyEquivalent: "x")
+        stopItem.keyEquivalentModifierMask = [.command]
+        stopItem.target = self
+        stopItem.isHidden = true
+        stopItem.isEnabled = false
+        menu.addItem(stopItem)
 
         menu.addItem(.separator())
 
@@ -30,6 +34,12 @@ final class MenuBarController: NSObject {
         prefs.keyEquivalentModifierMask = [.command]
         prefs.target = self
         menu.addItem(prefs)
+
+        let injection = NSMenuItem(title: "Input Insertion", action: #selector(toggleInputInsertion), keyEquivalent: "i")
+        injection.keyEquivalentModifierMask = [.command]
+        injection.target = self
+        injection.state = DanmakuPrefs.inputInjectionEnabled ? .on : .off
+        menu.addItem(injection)
 
         let dump = NSMenuItem(title: "Dump Latest 10 (Console)", action: #selector(didTapDumpLatest), keyEquivalent: "d")
         dump.keyEquivalentModifierMask = [.command, .shift]
@@ -54,14 +64,28 @@ final class MenuBarController: NSObject {
     }
 
     @objc private func didTapStart() {
+        startItem.isEnabled = false
+        startItem.isHidden = true
+        stopItem.isEnabled = true
+        stopItem.isHidden = false
         NotificationCenter.default.post(name: .danmakuStart, object: nil)
     }
 
     @objc private func didTapStop() {
+        stopItem.isEnabled = false
+        stopItem.isHidden = true
+        startItem.isEnabled = true
+        startItem.isHidden = false
         NotificationCenter.default.post(name: .danmakuStop, object: nil)
     }
 
     @objc private func didTapQuit() {
         NSApp.terminate(nil)
+    }
+
+    @objc private func toggleInputInsertion(_ sender: NSMenuItem) {
+        let newValue = !DanmakuPrefs.inputInjectionEnabled
+        DanmakuPrefs.inputInjectionEnabled = newValue
+        sender.state = newValue ? .on : .off
     }
 }
